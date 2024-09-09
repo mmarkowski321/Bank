@@ -54,6 +54,17 @@ def login_user(user_id, pin):
     return account
 
 
+def delete_user(user_id, name, pin):
+    conn = create_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM accounts WHERE user_id = ? AND pin = ?', (user_id, pin))
+        conn.commit()
+        print(f"Konto dla użytkownika {name} zostało usunięte")
+    except sqlite3.IntegrityError:
+        print("Użytkownik o tych danych nie istnieje.")
+
+
 def get_balance(user_id):
     conn = create_connection()
     cursor = conn.cursor()

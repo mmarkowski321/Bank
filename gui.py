@@ -1,15 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
-from database import create_table, register_user, login_user, get_balance, deposit, withdraw, transfer, get_transaction_history
+from database import create_table, register_user, login_user, get_balance, deposit, withdraw, transfer, get_transaction_history, delete_user
 
 create_table()
 
 root = tk.Tk()
 root.title("Aplikacja Bankowa")
 root.geometry("400x300")
-root.configure(bg="#f0f0f0")  # Kolor tła okna głównego
+root.configure(bg="#f0f0f0")
 
-def register():
+def register_account():
     user_id = entry_user_id.get()
     name = entry_name.get()
     pin = entry_pin.get()
@@ -30,6 +30,19 @@ def login():
         main_menu(user_id)
     else:
         messagebox.showwarning("Błąd", "Nieprawidłowy identyfikator lub PIN.")
+
+def delete_account():
+    user_id = entry_user_id.get()
+    name = entry_name.get()
+    pin=entry_pin.get()
+
+    if user_id and name and pin:
+        delete_user(user_id, name, pin)
+        messagebox.showinfo("Usuwanie", "Konto zostało usunięte.")
+    else:
+        messagebox.showwarning("Błąd", "Wypełnij wszytskie pola.")
+
+
 
 def main_menu(user_id):
     main_window = tk.Toplevel()
@@ -104,7 +117,8 @@ entry_pin.grid(row=2, column=1, padx=10, pady=5)
 frame_buttons = tk.Frame(root, bg="#f0f0f0", pady=10)
 frame_buttons.pack(fill=tk.BOTH, expand=True)
 
-tk.Button(frame_buttons, text="Rejestracja", command=register, bg="#4CAF50", fg="white").grid(row=0, column=0, padx=10, pady=5)
-tk.Button(frame_buttons, text="Logowanie", command=login, bg="#2196F3", fg="white").grid(row=0, column=1, padx=10, pady=5)
+tk.Button(frame_buttons, text="Rejestracja", command=register_account, bg="green", fg="white").grid(row=0, column=0, padx=10, pady=5)
+tk.Button(frame_buttons, text="Logowanie", command=login, bg="blue", fg="white").grid(row=0, column=1, padx=10, pady=5)
+tk.Button(frame_buttons, text="Usuń konto", command=delete_account, bg="red", fg="white").grid(row=0, column=2, padx=10, pady=5)
 
 root.mainloop()
