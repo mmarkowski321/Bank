@@ -1,16 +1,12 @@
 import sqlite3
 
-
 def create_connection():
     """Tworzy połączenie z bazą danych SQLite."""
-    conn = sqlite3.connect('bank.db')
-    return conn
-
+    return sqlite3.connect('bank.db')
 
 def create_table():
     conn = create_connection()
     cursor = conn.cursor()
-
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS accounts (
             user_id TEXT PRIMARY KEY,
@@ -32,7 +28,6 @@ def create_table():
     conn.commit()
     conn.close()
 
-
 def register_user(user_id, name, pin):
     conn = create_connection()
     cursor = conn.cursor()
@@ -44,7 +39,6 @@ def register_user(user_id, name, pin):
         print("Użytkownik o tym ID już istnieje.")
     conn.close()
 
-
 def login_user(user_id, pin):
     conn = create_connection()
     cursor = conn.cursor()
@@ -53,17 +47,13 @@ def login_user(user_id, pin):
     conn.close()
     return account
 
-
 def delete_user(user_id, name, pin):
     conn = create_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute('DELETE FROM accounts WHERE user_id = ? AND pin = ?', (user_id, pin))
-        conn.commit()
-        print(f"Konto dla użytkownika {name} zostało usunięte")
-    except sqlite3.IntegrityError:
-        print("Użytkownik o tych danych nie istnieje.")
-
+    cursor.execute('DELETE FROM accounts WHERE user_id = ? AND pin = ?', (user_id, pin))
+    conn.commit()
+    print(f"Konto dla użytkownika {name} zostało usunięte.")
+    conn.close()
 
 def get_balance(user_id):
     conn = create_connection()
@@ -73,7 +63,6 @@ def get_balance(user_id):
     conn.close()
     return balance[0] if balance else None
 
-
 def deposit(user_id, amount):
     conn = create_connection()
     cursor = conn.cursor()
@@ -82,7 +71,6 @@ def deposit(user_id, amount):
                    (user_id, amount))
     conn.commit()
     conn.close()
-
 
 def withdraw(user_id, amount):
     conn = create_connection()
@@ -100,7 +88,6 @@ def withdraw(user_id, amount):
     else:
         print("Brak wystarczających środków.")
     conn.close()
-
 
 def transfer(user_id_from, user_id_to, amount):
     conn = create_connection()
@@ -124,7 +111,6 @@ def transfer(user_id_from, user_id_to, amount):
         cursor.execute(
             'INSERT INTO transactions (user_id, type, amount, date) VALUES (?, "Transfer In", ?, datetime("now"))',
             (user_id_to, amount))
-
         conn.commit()
         print("Transfer zrealizowany.")
         conn.close()
@@ -133,7 +119,6 @@ def transfer(user_id_from, user_id_to, amount):
         print("Brak wystarczających środków na koncie nadawcy.")
         conn.close()
         return False
-
 
 def get_transaction_history(user_id):
     conn = create_connection()

@@ -20,14 +20,17 @@ class Account:
     def get_user_id(self):
         return self.user_id
 
+
 class SavingsAccount(Account):
     def __init__(self, user_id, name, pin, balance=0, interest_rate=0.02):
         super().__init__(user_id, name, pin, balance)
         self.interest_rate = interest_rate
 
     def add_interest(self):
-        self.balance += self.balance * self.interest_rate
-        print(f"Odsetki zostały dodane. Nowe saldo: {self.balance}")
+        interest = self.balance * self.interest_rate
+        self.balance += interest
+        return interest
+
 
 class CheckingAccount(Account):
     def __init__(self, user_id, name, pin, balance=0, transaction_fee=1.0):
@@ -38,7 +41,5 @@ class CheckingAccount(Account):
         total_amount = amount + self.transaction_fee
         if self.balance >= total_amount:
             self.balance -= total_amount
-            print(f"Opłata transakcyjna: {self.transaction_fee} zł. Wypłata zrealizowana.")
             return True
-        print("Brak wystarczających środków na koncie.")
         return False
