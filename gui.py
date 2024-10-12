@@ -9,7 +9,7 @@ create_table()
 root = tk.Tk()
 root.title("Aplikacja Bankowa")
 root.geometry("500x350")
-root.configure(bg="#f0f0f0")
+root.configure(bg="white")
 
 account_type = tk.StringVar(value="Konto Oszczędnościowe")
 current_account = None
