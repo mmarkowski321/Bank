@@ -1,8 +1,9 @@
-from database import create_table
+from database import create_table, create_connection
 from gui import root
 
 def main():
-    create_table()
+    conn = create_connection()
+    create_table(conn)
     root.mainloop()
 
 if __name__ == "__main__":

@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from database import create_table, register_user, login_user, get_balance, deposit, withdraw, transfer, \
+from database import create_connection, create_table, register_user, login_user, get_balance, deposit, withdraw, transfer, \
     get_transaction_history, delete_user
 from account import SavingsAccount, CheckingAccount
 
-create_table()
+conn = create_connection()
+create_table(conn)
 
 root = tk.Tk()
 root.title("Aplikacja Bankowa")
@@ -16,7 +17,7 @@ current_account = None
 
 
 def update_balance_label(label, user_id):
-    balance = get_balance(user_id)
+    balance = get_balance(user_id, conn)
     label.config(text=f"Saldo: {balance:.2f} zł")
 
 
@@ -36,7 +37,7 @@ def register_account():
             messagebox.showwarning("Błąd", "Wybierz typ konta.")
             return
 
-        register_user(user_id, name, pin)
+        register_user(user_id, name, pin, conn)
         messagebox.showinfo("Rejestracja", f"{acc_type} zostało zarejestrowane.")
     else:
         messagebox.showwarning("Błąd", "Wypełnij wszystkie pola.")
@@ -47,7 +48,7 @@ def login():
     user_id = entry_user_id.get()
     pin = entry_pin.get()
 
-    account = login_user(user_id, pin)
+    account = login_user(user_id, pin, conn)
     if account:
         if account_type.get() == "Konto Oszczędnościowe":
             current_account = SavingsAccount(user_id, account[1], pin)
@@ -66,7 +67,7 @@ def delete_account():
     pin = entry_pin.get()
 
     if user_id and name and pin:
-        delete_user(user_id, name, pin)
+        delete_user(user_id, name, pin, conn)
         messagebox.showinfo("Usuwanie", "Konto zostało usunięte.")
     else:
         messagebox.showwarning("Błąd", "Wypełnij wszystkie pola.")
@@ -86,25 +87,25 @@ def main_menu(user_id):
 
     def deposit_amount():
         amount = float(entry_amount.get())
-        deposit(user_id, amount)
+        deposit(user_id, amount, conn)
         messagebox.showinfo("Wpłata", "Wpłata została zrealizowana.")
         show_balance()
 
     def withdraw_amount():
         amount = float(entry_amount.get())
-        withdraw(user_id, amount)
+        withdraw(user_id, amount, conn)
         messagebox.showinfo("Wypłata", "Wypłata została zrealizowana.")
         show_balance()
 
     def transfer_amount():
         user_id_to = entry_user_id_to.get()
         amount = float(entry_amount.get())
-        transfer(user_id, user_id_to, amount)
+        transfer(user_id, user_id_to, amount, conn)
         messagebox.showinfo("Transfer", "Transfer został zrealizowany.")
         show_balance()
 
     def show_transactions():
-        transactions = get_transaction_history(user_id)
+        transactions = get_transaction_history(user_id, conn)
         trans_str = '\n'.join([f"Typ: {t[0]}, Kwota: {t[1]}, Data: {t[2]}" for t in transactions])
         messagebox.showinfo("Historia Transakcji", trans_str if transactions else "Brak historii transakcji.")
 
@@ -133,17 +134,14 @@ def main_menu(user_id):
     entry_user_id_to = tk.Entry(frame_inputs)
     entry_user_id_to.grid(row=1, column=1, padx=10, pady=5)
 
-    tk.Button(frame_buttons, text="Sprawdzenie Salda", command=show_balance, bg="#4CAF50", fg="white").pack(pady=5,
-                                                                                                            fill=tk.X)
+    tk.Button(frame_buttons, text="Sprawdzenie Salda", command=show_balance, bg="#4CAF50", fg="white").pack(pady=5, fill=tk.X)
     tk.Button(frame_buttons, text="Wpłata", command=deposit_amount, bg="#2196F3", fg="white").pack(pady=5, fill=tk.X)
     tk.Button(frame_buttons, text="Wypłata", command=withdraw_amount, bg="#FF9800", fg="white").pack(pady=5, fill=tk.X)
     tk.Button(frame_buttons, text="Transfer", command=transfer_amount, bg="#9C27B0", fg="white").pack(pady=5, fill=tk.X)
-    tk.Button(frame_buttons, text="Historia Transakcji", command=show_transactions, bg="#607D8B", fg="white").pack(
-        pady=5, fill=tk.X)
+    tk.Button(frame_buttons, text="Historia Transakcji", command=show_transactions, bg="#607D8B", fg="white").pack(pady=5, fill=tk.X)
 
     if isinstance(current_account, SavingsAccount):
-        tk.Button(frame_buttons, text="Nalicz odsetki", command=add_interest, bg="#FFC107", fg="white").pack(pady=5,
-                                                                                                             fill=tk.X)
+        tk.Button(frame_buttons, text="Nalicz odsetki", command=add_interest, bg="#FFC107", fg="white").pack(pady=5, fill=tk.X)
 
     tk.Button(frame_buttons, text="Wyloguj", command=logout, bg="#f44336", fg="white").pack(pady=5, fill=tk.X)
 
@@ -173,10 +171,8 @@ account_type.current(0)
 frame_buttons = tk.Frame(root, bg="#f0f0f0", pady=10)
 frame_buttons.pack(fill=tk.BOTH, expand=True)
 
-tk.Button(frame_buttons, text="Rejestracja", command=register_account, bg="green", fg="white").grid(row=0, column=0,
-                                                                                                    padx=10, pady=5)
+tk.Button(frame_buttons, text="Rejestracja", command=register_account, bg="green", fg="white").grid(row=0, column=0, padx=10, pady=5)
 tk.Button(frame_buttons, text="Logowanie", command=login, bg="blue", fg="white").grid(row=0, column=1, padx=10, pady=5)
-tk.Button(frame_buttons, text="Usuń konto", command=delete_account, bg="red", fg="white").grid(row=0, column=2, padx=10,
-                                                                                               pady=5)
+tk.Button(frame_buttons, text="Usuń konto", command=delete_account, bg="red", fg="white").grid(row=0, column=2, padx=10, pady=5)
 
 root.mainloop()

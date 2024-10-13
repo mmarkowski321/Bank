@@ -1,11 +1,10 @@
 import sqlite3
 
-def create_connection():
+def create_connection(db_file='bank.db'):
     """Tworzy połączenie z bazą danych SQLite."""
-    return sqlite3.connect('bank.db')
+    return sqlite3.connect(db_file)
 
-def create_table():
-    conn = create_connection()
+def create_table(conn):
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS accounts (
@@ -26,10 +25,8 @@ def create_table():
         )
     ''')
     conn.commit()
-    conn.close()
 
-def register_user(user_id, name, pin):
-    conn = create_connection()
+def register_user(user_id, name, pin, conn):
     cursor = conn.cursor()
     try:
         cursor.execute('INSERT INTO accounts (user_id, name, pin) VALUES (?, ?, ?)', (user_id, name, pin))
@@ -37,43 +34,33 @@ def register_user(user_id, name, pin):
         print(f"Konto dla użytkownika {name} zostało utworzone.")
     except sqlite3.IntegrityError:
         print("Użytkownik o tym ID już istnieje.")
-    conn.close()
 
-def login_user(user_id, pin):
-    conn = create_connection()
+def login_user(user_id, pin, conn):
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM accounts WHERE user_id = ? AND pin = ?', (user_id, pin))
     account = cursor.fetchone()
-    conn.close()
     return account
 
-def delete_user(user_id, name, pin):
-    conn = create_connection()
+def delete_user(user_id, name, pin, conn):
     cursor = conn.cursor()
     cursor.execute('DELETE FROM accounts WHERE user_id = ? AND pin = ?', (user_id, pin))
     conn.commit()
     print(f"Konto dla użytkownika {name} zostało usunięte.")
-    conn.close()
 
-def get_balance(user_id):
-    conn = create_connection()
+def get_balance(user_id, conn):
     cursor = conn.cursor()
     cursor.execute('SELECT balance FROM accounts WHERE user_id = ?', (user_id,))
     balance = cursor.fetchone()
-    conn.close()
     return balance[0] if balance else None
 
-def deposit(user_id, amount):
-    conn = create_connection()
+def deposit(user_id, amount, conn):
     cursor = conn.cursor()
     cursor.execute('UPDATE accounts SET balance = balance + ? WHERE user_id = ?', (amount, user_id))
     cursor.execute('INSERT INTO transactions (user_id, type, amount, date) VALUES (?, "Deposit", ?, datetime("now"))',
                    (user_id, amount))
     conn.commit()
-    conn.close()
 
-def withdraw(user_id, amount):
-    conn = create_connection()
+def withdraw(user_id, amount, conn):
     cursor = conn.cursor()
     cursor.execute('SELECT balance FROM accounts WHERE user_id = ?', (user_id,))
     balance = cursor.fetchone()[0]
@@ -85,18 +72,17 @@ def withdraw(user_id, amount):
             (user_id, amount))
         conn.commit()
         print("Wypłata zrealizowana.")
+        return True
     else:
         print("Brak wystarczających środków.")
-    conn.close()
+        return False
 
-def transfer(user_id_from, user_id_to, amount):
-    conn = create_connection()
+def transfer(user_id_from, user_id_to, amount, conn):
     cursor = conn.cursor()
 
     cursor.execute('SELECT balance FROM accounts WHERE user_id = ?', (user_id_to,))
     if cursor.fetchone() is None:
         print("Konto docelowe nie istnieje.")
-        conn.close()
         return False
 
     cursor.execute('SELECT balance FROM accounts WHERE user_id = ?', (user_id_from,))
@@ -113,17 +99,13 @@ def transfer(user_id_from, user_id_to, amount):
             (user_id_to, amount))
         conn.commit()
         print("Transfer zrealizowany.")
-        conn.close()
         return True
     else:
         print("Brak wystarczających środków na koncie nadawcy.")
-        conn.close()
         return False
 
-def get_transaction_history(user_id):
-    conn = create_connection()
+def get_transaction_history(user_id, conn):
     cursor = conn.cursor()
     cursor.execute('SELECT type, amount, date FROM transactions WHERE user_id = ? ORDER BY date DESC', (user_id,))
     transactions = cursor.fetchall()
-    conn.close()
     return transactions
