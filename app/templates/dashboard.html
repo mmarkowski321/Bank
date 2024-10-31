@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Aplikacja Bankowa</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Witaj w Aplikacji Bankowej</h1>
+
+
+        <div class="balance-section">
+            <h2>Twoje saldo:</h2>
+            <p id="balance">Ładowanie...</p>
+            <button onclick="getBalance()">Odśwież saldo</button>
+        </div>
+
+
+        <div class="form-container">
+            <h2>Wpłata</h2>
+            <input type="number" id="deposit_amount" placeholder="Kwota">
+            <button onclick="deposit()">Wpłać</button>
+        </div>
+
+
+        <div class="form-container">
+            <h2>Wypłata</h2>
+            <input type="number" id="withdraw_amount" placeholder="Kwota">
+            <button onclick="withdraw()">Wypłać</button>
+        </div>
+
+
+        <div class="form-container">
+            <h2>Transfer</h2>
+            <input type="text" id="transfer_to_user_id" placeholder="Identyfikator odbiorcy">
+            <input type="number" id="transfer_amount" placeholder="Kwota">
+            <button onclick="transfer()">Wyślij</button>
+        </div>
+
+
+        <div class="form-container">
+            <h2>Historia transakcji</h2>
+            <button onclick="getTransactionHistory()">Pokaż historię</button>
+            <ul id="transaction_history"></ul>
+        </div>
+
+        <button onclick="logout()">Wyloguj</button>
+        <div id="message"></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
