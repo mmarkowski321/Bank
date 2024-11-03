@@ -10,7 +10,7 @@ async function login() {
 
     const result = await response.json();
     if (result.user_id) {
-        window.location.href = `/dashboard.html?user_id=${userId}`;
+        window.location.href = `/dashboard?user_id=${userId}`;
     } else {
         document.getElementById('message').innerText = result.error || "Błąd logowania";
     }

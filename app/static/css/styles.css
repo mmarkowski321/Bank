@@ -1,20 +1,24 @@
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Corbel, sans-serif;
     background-color: #f9f9f9;
 }
 
 .container {
-    max-width: 400px;
     margin: 50px auto;
     padding: 20px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-h1, h2 {
+h1{
     text-align: center;
     color: #333;
+    font-family: Corbel;
+}
+h2 {
+    text-align: left;
+    color: #333;
+    font-family: Corbel;
 }
 
 .form-container {
@@ -25,6 +29,7 @@ label, input, button {
     display: block;
     width: 100%;
     margin-bottom: 10px;
+    font-family: Corbel;
 }
 
 button {
@@ -33,10 +38,12 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    max-width: 300px;
+    align-content: center;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #093042;
 }
 
 #message {

@@ -43,7 +43,7 @@ class RegularAccount(Account):
 
 class SavingsAccount(Account):
     """Klasa reprezentująca konto oszczędnościowe z odsetkami."""
-    def __init__(self, user_id, name, pin, balance=0, interest_rate=0.02):
+    def __init__(self, user_id, name, pin, balance=0, interest_rate=0.05):
         super().__init__(user_id, name, pin, balance)
         self.interest_rate = interest_rate
 
