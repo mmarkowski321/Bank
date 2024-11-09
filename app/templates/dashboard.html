@@ -1,57 +1,59 @@
 <!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Aplikacja Bankowa</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
-</head>
-<body>
-    <div class="container">
-        <h1>Witaj w Aplikacji Bankowej</h1>
-
-
-        <div class="balance-section">
-            <h2>Twoje saldo:</h2>
-            <p id="balance">Ładowanie...</p>
-            <button onclick="getBalance()">Odśwież saldo</button>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard - Bank Application</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    </head>
+    <body>
+        <div id="title">
+            <h1>Welcome to Markbank</h1>
         </div>
 
+        <div id="main">
+            <div class="container balance-section">
+                <h2>Your Balance:</h2>
+                <p id="balance" title="Your current account balance.">Loading...</p>
+                <button onclick="getBalance()" title="Click to refresh your account balance.">Refresh Balance</button>
+            </div>
 
-        <div class="form-container">
-            <h2>Wpłata</h2>
-            <input type="number" id="deposit_amount" placeholder="Kwota">
-            <button onclick="deposit()">Wpłać</button>
+            <div class="container form-container">
+                <h2>Deposit</h2>
+                <input type="number" id="deposit_amount" placeholder="Amount" title="Enter the amount you want to deposit.">
+                <button onclick="deposit()" title="Click to deposit the entered amount into your account.">Deposit</button>
+            </div>
+
+            <div class="container form-container">
+                <h2>Withdraw</h2>
+                <input type="number" id="withdraw_amount" placeholder="Amount" title="Enter the amount you want to withdraw.">
+                <button onclick="withdraw()" title="Click to withdraw the entered amount from your account.">Withdraw</button>
+            </div>
+
+            <div class="container form-container">
+                <h2>Transfer</h2>
+                <input type="text" id="transfer_to_user_id" placeholder="Recipient ID" title="Enter the User ID of the person you want to transfer money to.">
+                <input type="number" id="transfer_amount" placeholder="Amount" title="Enter the amount you want to transfer.">
+                <button onclick="transfer()" title="Click to transfer the entered amount to the recipient.">Send</button>
+            </div>
+
+            <div class="container form-container">
+                <h2>Transaction History</h2>
+                <button onclick="goToTransactionHistory()" title="Click to view your transaction history.">Show History</button>
+            </div>
+
+            <div class="container form-container">
+                <h2>Profile Settings</h2>
+                <button type="button" onclick="profileSettings()" title="Click to change your password and update your contact details.">Change Password & Update Details</button>
+            </div>
+
+            <button onclick="logout()" title="Click to log out of your account.">Logout</button>
+            <div id="message" title="Displays important messages and alerts."></div>
         </div>
 
-
-        <div class="form-container">
-            <h2>Wypłata</h2>
-            <input type="number" id="withdraw_amount" placeholder="Kwota">
-            <button onclick="withdraw()">Wypłać</button>
-        </div>
-
-
-        <div class="form-container">
-            <h2>Transfer</h2>
-            <input type="text" id="transfer_to_user_id" placeholder="Identyfikator odbiorcy">
-            <input type="number" id="transfer_amount" placeholder="Kwota">
-            <button onclick="transfer()">Wyślij</button>
-        </div>
-
-
-        <div class="form-container">
-            <h2>Historia transakcji</h2>
-            <button onclick="getTransactionHistory()">Pokaż historię</button>
-            <ul id="transaction_history"></ul>
-        </div>
-
-        <button onclick="logout()">Wyloguj</button>
-        <div id="message"></div>
-    </div>
-
-
-</body>
+        <footer>
+            <p>This application is created solely for personal use, with the purpose of enhancing IT skills and learning about web development. It is not affiliated with any real bank and does not handle any actual financial transactions. Please note that this is a learning project and should not be mistaken for a genuine banking service.</p>
+        </footer>
+    </body>
 </html>

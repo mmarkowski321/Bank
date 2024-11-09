@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markbank - Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+    <div id="title">
+        <h1>Markbank Registration</h1>
+    </div>
+    <div id="main">
+        <div class="container" id="register">
+            <h2>Create an Account</h2>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input id="first_name" type="text" required title="Enter your first name.">
+                </div>
+                <div class="form-group">
+                    <label for="middle_name">Middle Name (Optional)</label>
+                    <input id="middle_name" type="text" title="Enter your middle name (optional).">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input id="last_name" type="text" required title="Enter your last name.">
+                </div>
+                <div class="form-group">
+                    <label for="birth_date">Date of Birth</label>
+                    <input id="birth_date" type="date" required title="Select your date of birth.">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" required title="Enter your email address.">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input id="phone" type="tel" required title="Enter your phone number.">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input id="password" type="password" required title="Enter a strong password.">
+                        <i class="far fa-eye" onclick="togglePasswordVisibility('password', this)" title="Click to show or hide the password."></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input id="confirm_password" type="password" required title="Re-enter your password to confirm.">
+                        <i class="far fa-eye" onclick="togglePasswordVisibility('confirm_password', this)" title="Click to show or hide the password."></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pin">Pin (4 digits)</label>
+                    <div class="password-wrapper">
+                        <input
+                            id="pin"
+                            type="password"
+                            pattern="\d{4}"
+                            title="Enter exactly 4 digits for your pin."
+                            maxlength="4"
+                            required
+                            oninput="validatePinLength(this)"
+                        />
+                        <i class="far fa-eye" onclick="togglePasswordVisibility('pin', this)" title="Click to show or hide the pin."></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <div>
+                        <input type="radio" id="savings_account" name="account_type" value="savings" required title="Select this for a savings account.">
+                        <label for="savings_account">Savings Account</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="regular_account" name="account_type" value="regular" title="Select this for a regular account.">
+                        <label for="regular_account">Regular Account</label>
+                    </div>
+                </div>
+                <button type="submit" title="Click to register your account.">Register</button>
+            </form>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden">
+            <div class="checkmark-wrapper">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14 27l7.5 7.5L38 17"/>
+                </svg>
+            </div>
+            <p>Registration successful! Please check your email for your user ID.</p>
+        </div>
+    </div>
+    <footer>
+        <p>This application is created solely for personal use, with the purpose of enhancing IT skills and learning about web development. It is not affiliated with any real bank and does not handle any actual financial transactions. Please note that this is a learning project and should not be mistaken for a genuine banking service.</p>
+    </footer>
+</body>
+</html>

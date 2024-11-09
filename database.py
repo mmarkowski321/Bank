@@ -1,135 +1,228 @@
+import uuid
+import smtplib
+from email.mime.text import MIMEText
 from app.db_utils import get_db
 import psycopg2
-
+import logging
+import os
 class Database:
-    def register_user(self, user_id, name, pin):
-        """Rejestracja nowego użytkownika."""
-        try:
-            cursor = get_db().cursor()
-            cursor.execute(
-                'INSERT INTO accounts (user_id, name, pin) VALUES (%s, %s, %s)',
-                (user_id, name, pin)
-            )
-            get_db().commit()
-            cursor.close()
-            return {"message": "Konto zostało utworzone"}
-        except psycopg2.IntegrityError:
-            get_db().rollback()
-            return {"error": "Użytkownik o tym ID już istnieje"}
 
-    def login_user(self, user_id, pin):
-        """Logowanie użytkownika na podstawie ID i PIN-u."""
-        cursor = get_db().cursor()
+    def register_user(self, user_data, account_data):
+        """Registers a new user and account."""
+        try:
+            db = get_db()
+            cursor = db.cursor()
+
+            # Generate a unique user_id_uuid using uuid
+            user_id_uuid = str(uuid.uuid4())
+
+            # Insert user data into the users table
+            cursor.execute(
+                'INSERT INTO users (user_id_uuid, first_name, middle_name, last_name, email, phone_number, date_of_birth) '
+                'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                (user_id_uuid, user_data['first_name'], user_data.get('middle_name', None),
+                 user_data['last_name'], user_data['email'], user_data['phone_number'], user_data['date_of_birth'])
+            )
+
+            # Insert account data into the accounts table
+            cursor.execute(
+                'INSERT INTO accounts (pin, password, account_type, user_id_uuid) VALUES (%s, %s, %s, %s)',
+                (account_data['pin'], account_data['password'], account_data['account_type'], user_id_uuid)
+            )
+
+            db.commit()
+            cursor.close()
+
+            # Send an email with the user_id_uuid
+            self.send_email_with_user_id(user_data['email'], user_id_uuid)
+
+            return {"message": "Account created. Please check your email for your unique user ID."}
+
+        except psycopg2.IntegrityError as e:
+            db.rollback()
+            logging.error("Database integrity error: %s", e)
+            return {"error": "A user with this email already exists"}
+        except Exception as e:
+            db.rollback()
+            logging.error("Database error: %s", e)
+            return {"error": "An error occurred during account creation"}
+
+    def send_email_with_user_id(self, email, user_id_uuid):
+        """Send an email with the user_id_uuid to the user."""
+        try:
+            # Email configuration
+            sender_email = os.getenv('APP_SENDER')
+            sender_password = os.getenv('APP_PASSWORD')
+            smtp_server = "smtp.gmail.com"
+            smtp_port = 587
+
+
+            subject = "Welcome to Markbank - Your User ID"
+            body = f"Hello,\n\nThank you for registering at Markbank. Your unique User ID is: {user_id_uuid}\n\nPlease keep it safe."
+            msg = MIMEText(body)
+            msg['Subject'] = subject
+            msg['From'] = sender_email
+            msg['To'] = email
+
+            # Send the email
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.send_message(msg)
+
+            logging.info("Email sent successfully to %s", email)
+        except Exception as e:
+            logging.error("Failed to send email: %s", e)
+
+    def login_user(self, user_id_uuid, password):
+        """Logs in a user based on user_id_uuid and password."""
+        db = get_db()
+        cursor = db.cursor()
         cursor.execute(
-            'SELECT * FROM accounts WHERE user_id = %s AND pin = %s',
-            (user_id, pin)
+            'SELECT account_id, user_id_uuid, password, balance FROM accounts WHERE user_id_uuid = %s AND password = %s',
+            (user_id_uuid, password)
         )
         account = cursor.fetchone()
         cursor.close()
         return account
 
-    def get_balance(self, user_id):
-        """Pobiera saldo użytkownika."""
+    def get_balance(self, user_id_uuid):
+        """Fetches the user's balance based on user_id_uuid."""
         cursor = get_db().cursor()
         cursor.execute(
-            'SELECT balance FROM accounts WHERE user_id = %s',
-            (user_id,)
+            'SELECT balance FROM accounts WHERE user_id_uuid = %s',
+            (user_id_uuid,)
         )
         balance = cursor.fetchone()
         cursor.close()
         return balance[0] if balance else None
 
-    def deposit(self, user_id, amount):
-        """Wpłata środków na konto użytkownika."""
+    def deposit(self, user_id_uuid, amount):
+        """Deposits funds into the user's account."""
         cursor = get_db().cursor()
         cursor.execute(
-            'UPDATE accounts SET balance = balance + %s WHERE user_id = %s',
-            (amount, user_id)
+            'UPDATE accounts SET balance = balance + %s WHERE user_id_uuid = %s',
+            (amount, user_id_uuid)
         )
         cursor.execute(
-            'INSERT INTO transactions (user_id, type, amount, date) VALUES (%s, %s, %s, NOW())',
-            (user_id, "Deposit", amount)
+            'INSERT INTO transactions (user_id_uuid, type, amount, date) VALUES (%s, %s, %s, NOW())',
+            (user_id_uuid, "Deposit", amount)
         )
         get_db().commit()
         cursor.close()
-        return {"message": "Wpłata została zrealizowana"}
+        return {"message": "Deposit successful"}
 
-    def withdraw(self, user_id, amount):
-        """Wypłata środków z konta użytkownika."""
+    def withdraw(self, user_id_uuid, amount):
+        """Withdraws funds from the user's account."""
         cursor = get_db().cursor()
         cursor.execute(
-            'SELECT balance FROM accounts WHERE user_id = %s',
-            (user_id,)
+            'SELECT balance FROM accounts WHERE user_id_uuid = %s',
+            (user_id_uuid,)
         )
         balance = cursor.fetchone()[0]
 
         if balance >= amount:
             cursor.execute(
-                'UPDATE accounts SET balance = balance - %s WHERE user_id = %s',
-                (amount, user_id)
+                'UPDATE accounts SET balance = balance - %s WHERE user_id_uuid = %s',
+                (amount, user_id_uuid)
             )
             cursor.execute(
-                'INSERT INTO transactions (user_id, type, amount, date) VALUES (%s, %s, %s, NOW())',
-                (user_id, "Withdrawal", amount)
+                'INSERT INTO transactions (user_id_uuid, type, amount, date) VALUES (%s, %s, %s, NOW())',
+                (user_id_uuid, "Withdrawal", amount)
             )
             get_db().commit()
             cursor.close()
-            return {"message": "Wypłata została zrealizowana"}
+            return {"message": "Withdrawal successful"}
         else:
             cursor.close()
-            return {"error": "Brak wystarczających środków"}
+            return {"error": "Insufficient funds"}
 
-    def transfer(self, user_id_from, user_id_to, amount):
-        """Przelew między użytkownikami."""
+    def transfer(self, user_id_from_uuid, user_id_to_uuid, amount):
+        """Transfers funds between two users."""
         cursor = get_db().cursor()
 
-        # Sprawdzenie istnienia konta docelowego
+        # Check existence of recipient account
         cursor.execute(
-            'SELECT balance FROM accounts WHERE user_id = %s',
-            (user_id_to,)
+            'SELECT balance FROM accounts WHERE user_id_uuid = %s',
+            (user_id_to_uuid,)
         )
         if cursor.fetchone() is None:
             cursor.close()
-            return {"error": "Konto docelowe nie istnieje"}
+            return {"error": "Recipient account does not exist"}
 
-        # Sprawdzenie wystarczających środków
+        # Check sufficient funds
         cursor.execute(
-            'SELECT balance FROM accounts WHERE user_id = %s',
-            (user_id_from,)
+            'SELECT balance FROM accounts WHERE user_id_uuid = %s',
+            (user_id_from_uuid,)
         )
         balance_from = cursor.fetchone()[0]
 
         if balance_from >= amount:
             cursor.execute(
-                'UPDATE accounts SET balance = balance - %s WHERE user_id = %s',
-                (amount, user_id_from)
+                'UPDATE accounts SET balance = balance - %s WHERE user_id_uuid = %s',
+                (amount, user_id_from_uuid)
             )
             cursor.execute(
-                'UPDATE accounts SET balance = balance + %s WHERE user_id = %s',
-                (amount, user_id_to)
+                'UPDATE accounts SET balance = balance + %s WHERE user_id_uuid = %s',
+                (amount, user_id_to_uuid)
             )
             cursor.execute(
-                'INSERT INTO transactions (user_id, type, amount, date) VALUES (%s, %s, %s, NOW())',
-                (user_id_from, "Transfer Out", amount)
+                'INSERT INTO transactions (user_id_uuid, type, amount, date) VALUES (%s, %s, %s, NOW())',
+                (user_id_from_uuid, "Transfer Out", amount)
             )
             cursor.execute(
-                'INSERT INTO transactions (user_id, type, amount, date) VALUES (%s, %s, %s, NOW())',
-                (user_id_to, "Transfer In", amount)
+                'INSERT INTO transactions (user_id_uuid, type, amount, date) VALUES (%s, %s, %s, NOW())',
+                (user_id_to_uuid, "Transfer In", amount)
             )
             get_db().commit()
             cursor.close()
-            return {"message": "Transfer został zrealizowany"}
+            return {"message": "Transfer successful"}
         else:
             cursor.close()
-            return {"error": "Brak wystarczających środków na koncie nadawcy"}
+            return {"error": "Insufficient funds in sender's account"}
 
-    def get_transaction_history(self, user_id):
-        """Pobiera historię transakcji użytkownika."""
+    def get_transaction_history(self, user_id_uuid):
+        """Fetches the transaction history for a user."""
         cursor = get_db().cursor()
         cursor.execute(
-            'SELECT type, amount, date FROM transactions WHERE user_id = %s ORDER BY date DESC',
-            (user_id,)
+            'SELECT type, amount, date FROM transactions WHERE user_id_uuid = %s ORDER BY date DESC',
+            (user_id_uuid,)
         )
         transactions = cursor.fetchall()
         cursor.close()
         return [{"type": t[0], "amount": t[1], "date": t[2]} for t in transactions]
+
+    def update_user_details(self, user_id_uuid, email, phone_number):
+        """Updates the user's email and phone number."""
+        cursor = get_db().cursor()
+        cursor.execute(
+            'UPDATE users SET email = %s, phone_number = %s WHERE user_id_uuid = %s',
+            (email, phone_number, user_id_uuid)
+        )
+        get_db().commit()
+        cursor.close()
+        return {"message": "Personal details updated"}
+
+    def update_password(self, account_id, new_password):
+        """Updates the user's account password."""
+        cursor = get_db().cursor()
+        cursor.execute(
+            'UPDATE accounts SET password = %s WHERE account_id = %s',
+            (new_password, account_id)
+        )
+        get_db().commit()
+        cursor.close()
+        return {"message": "Password updated successfully"}
+
+    def getCurrentPassword(self, user_id_uuid):
+        """Fetches the current password for the user."""
+        cursor = get_db().cursor()
+        cursor.execute(
+            'SELECT password FROM accounts WHERE user_id_uuid = %s', (user_id_uuid,)
+        )
+        result = cursor.fetchone()
+        cursor.close()
+
+        if result:
+            return result[0]
+        return None
