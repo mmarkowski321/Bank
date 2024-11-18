@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Application - Login and Registration</title>
+    <title>Markbank - Login and Registration</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </head>
 <body>
+    {% include 'header.html' %}
+
     <div id="title">
         <h1>Markbank</h1>
     </div>
+
     <div id="main">
         <div class="container" id="sign_in">
             <h2>Sign in</h2>
@@ -29,13 +32,15 @@
                 </div>
                 <button type="submit" title="Click to sign in to your account.">Sign in</button>
             </form>
-            <div id="message" title="Displays important messages and alerts."></div>
+            <div id="message" class="message"></div>
         </div>
+
         <div class="container" id="sign_up">
             <h2>Registration</h2>
             <button type="button" onclick="displayRegistration()" title="Click to register a new account.">Sign up</button>
         </div>
     </div>
+
     <footer>
         <p>This application is created solely for personal use, with the purpose of enhancing IT skills and learning about web development. It is not affiliated with any real bank and does not handle any actual financial transactions. Please note that this is a learning project and should not be mistaken for a genuine banking service.</p>
     </footer>

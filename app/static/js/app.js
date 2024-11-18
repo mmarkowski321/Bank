@@ -35,21 +35,30 @@ function displayRegistration() {
 
 // Funkcja rejestracji
 // Function to handle user registration
+// Function to handle user registration
 async function register(event) {
     event.preventDefault();
 
+    // Check if passwords match
     if (document.getElementById('password').value === document.getElementById('confirm_password').value) {
+        // Retrieve form values
         const firstName = document.getElementById('first_name').value;
         const middleName = document.getElementById('middle_name').value;
         const lastName = document.getElementById('last_name').value;
         const dateOfBirth = document.getElementById('birth_date').value;
         const email = document.getElementById('email').value;
+
+        // Get the selected country code and phone number
+        const countryCode = document.getElementById('country_code').value;
         const phone = document.getElementById('phone').value;
+        const fullPhoneNumber = `${countryCode}${phone}`; // Combine country code and phone number
+
         const password = document.getElementById('password').value;
         const pin = document.getElementById('pin').value;
         const accountType = document.querySelector('input[name="account_type"]:checked').value;
 
         try {
+            // Send registration data to the server
             const response = await fetch('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -59,7 +68,7 @@ async function register(event) {
                     last_name: lastName,
                     date_of_birth: dateOfBirth,
                     email: email,
-                    phone: phone,
+                    phone: fullPhoneNumber, // Use the combined full phone number
                     password: password,
                     pin: pin,
                     account_type: accountType
@@ -169,6 +178,10 @@ async function changePassword(event) {
     const confirmNewPassword = document.getElementById('confirm_new_password').value;
     const userId = new URLSearchParams(window.location.search).get('user_id');
 
+    console.log("User ID:", userId);
+    console.log("Current Password:", currentPasswordFromHTML);
+    console.log("New Password:", newPassword);
+
     try {
         // Fetch the current password from the database
         const passwordResponse = await fetch('/get_current_password', {
@@ -184,7 +197,6 @@ async function changePassword(event) {
         const passwordData = await passwordResponse.json();
         const currentPasswordFromDatabase = passwordData.current_password;
 
-        // Compare the passwords
         if (currentPasswordFromDatabase !== currentPasswordFromHTML) {
             alert("Wrong Current Password");
             return;
@@ -195,7 +207,6 @@ async function changePassword(event) {
             return;
         }
 
-        // Proceed to update the password
         const updateResponse = await fetch('/update_password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -205,6 +216,7 @@ async function changePassword(event) {
         const result = await updateResponse.json();
         alert(result.message || result.error);
     } catch (error) {
+        console.error("Error during password change:", error);
         alert(`Error: ${error.message}`);
     }
 }
@@ -218,11 +230,22 @@ async function updateData(event) {
     const newPhone = document.getElementById('new_phone').value;
     const userId = new URLSearchParams(window.location.search).get('user_id');
 
+    // Prepare the data object with only filled-out fields
+    let dataToUpdate = { user_id: userId };
+    if (newEmail) dataToUpdate.email = newEmail;
+    if (newPhone) dataToUpdate.phone = newPhone;
+
+    // Check if at least one field is filled out
+    if (!newEmail && !newPhone) {
+        alert("Please fill out at least one field to update.");
+        return;
+    }
+
     try {
         const response = await fetch('/update_user_details', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, email: newEmail, phone: newPhone })
+            body: JSON.stringify(dataToUpdate)
         });
 
         const result = await response.json();
@@ -249,3 +272,39 @@ function validatePinLength(input) {
         input.value = input.value.slice(0, 4); // Limit to 4 characters
     }
 }
+// Function to populate country codes
+function populateCountryCodes() {
+    const countryCodes = [
+        { name: "United States", code: "+1" },
+        { name: "United Kingdom", code: "+44" },
+        { name: "India", code: "+91" },
+        { name: "Australia", code: "+61" },
+        { name: "Japan", code: "+81" },
+        { name: "Germany", code: "+49" },
+        { name: "China", code: "+86" },
+        { name: "France", code: "+33" },
+        { name: "Italy", code: "+39" },
+        { name: "Spain", code: "+34" },
+        { name: "Brazil", code: "+55" },
+        { name: "Russia", code: "+7" },
+        { name: "South Africa", code: "+27" },
+        { name: "Nigeria", code: "+234" },
+        { name: "Mexico", code: "+52" },
+        { name: "Netherlands", code: "+31" },
+        { name: "Poland", code: "+48" },
+        // Add more country codes as needed
+    ];
+
+    const select = document.getElementById('country_code');
+    countryCodes.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country.code;
+        option.textContent = `${country.name} (${country.code})`;
+        select.appendChild(option);
+    });
+}
+
+// Call the populateCountryCodes function on window load
+window.onload = function() {
+    populateCountryCodes();
+};

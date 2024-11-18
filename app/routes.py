@@ -106,13 +106,24 @@ def initialize_routes(app):
 
     @app.route('/update_user_details', methods=['POST'])
     def update_user_details():
-        data = request.get_json()
-        user_id = data['user_id']
-        email = data['email']
-        phone_number = data['phone']
+        try:
+            data = request.get_json()
+            user_id = data.get('user_id')
+            email = data.get('email')
+            phone_number = data.get('phone')
 
-        result = db.update_user_details(user_id, email, phone_number)
-        return jsonify(result), 200
+            if not user_id:
+                return jsonify({"error": "User ID is required"}), 400
+
+            # Check if at least one of the fields is provided
+            if not email and not phone_number:
+                return jsonify({"error": "Please provide an email or phone number to update"}), 400
+
+            # Update the database with the provided fields
+            result = db.update_user_details(user_id, email, phone_number)
+            return jsonify(result), 200
+        except Exception as e:
+            return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
     @app.route('/profile.html')
     def profile_page():
