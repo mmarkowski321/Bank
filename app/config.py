@@ -11,3 +11,8 @@ class Config:
         'host': os.getenv('DATABASE_HOST'),
         'port': os.getenv('DATABASE_PORT')
     }
+
+    APP = {
+        'sender': os.getenv('APP_SENDER'),
+        'password': os.getenv('APP_PASSWORD')
+    }

@@ -1,5 +1,6 @@
 import uuid
 import smtplib
+from app.config import Config
 from email.mime.text import MIMEText
 from app.db_utils import get_db
 import psycopg2
@@ -50,13 +51,13 @@ class Database:
     def send_email_with_user_id(self, email, user_id_uuid):
         """Send an email with the user_id_uuid to the user."""
         try:
-            # Email configuration
-            sender_email = os.getenv('APP_SENDER')
-            sender_password = os.getenv('APP_PASSWORD')
+            # Pobranie konfiguracji z klasy Config
+            sender_email = Config.APP['sender']
+            sender_password = Config.APP['password']
             smtp_server = "smtp.gmail.com"
             smtp_port = 587
 
-
+            # Tworzenie treści e-maila
             subject = "Welcome to Markbank - Your User ID"
             body = f"Hello,\n\nThank you for registering at Markbank. Your unique User ID is: {user_id_uuid}\n\nPlease keep it safe."
             msg = MIMEText(body)
@@ -64,7 +65,7 @@ class Database:
             msg['From'] = sender_email
             msg['To'] = email
 
-            # Send the email
+            # Wysyłanie e-maila
             with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()
                 server.login(sender_email, sender_password)
