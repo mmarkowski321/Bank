@@ -1,13 +1,17 @@
-FROM ubuntu:20.04
-# Instalacja zależności systemowych
-RUN apt-get update && apt-get install -y \
- python3 \
- nodejs \
- build-essential \
+# Użycie lekkiego obrazu Python
+FROM python:3.9-slim
+
+# Ustawienie katalogu roboczego
+WORKDIR /app
+
+# Kopiowanie pliku z zależnościami aplikacji
+COPY requirements.txt /app/
 
 # Instalacja zależności aplikacji
-COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
-# Kopiowanie kodu źródłowego
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Kopiowanie całego kodu źródłowego do kontenera
 COPY . /app/
-CMD ["python3", "/app/app.py"]
+
+# Domyślne polecenie uruchamiające aplikację
+CMD ["python", "run.py"]
