@@ -37,9 +37,12 @@
                     <input id="email" type="email" required title="Enter your email address.">
                 </div>
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input id="phone" type="tel" required title="Enter your phone number.">
-                </div>
+    <label for="phone">Phone Number</label>
+    <div style="display: flex;">
+        <select id="country_code" required title="Select your country code"></select>
+        <input id="phone" type="tel" required title="Enter your phone number without the country code." style="flex: 1;">
+    </div>
+</div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-wrapper">

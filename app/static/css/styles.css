@@ -10,6 +10,21 @@ body {
 }
 
 /* Header style */
+#header {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #140850, #1f3b73);
+    color: white;
+}
+
+#header img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+}
+
+/* Title section */
 #title {
     width: 80%;
     margin: 20px auto;
@@ -18,13 +33,6 @@ body {
     border-radius: 20px;
     text-align: center;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-h1 {
-    font-size: xx-large;
-    color: #140850;
-    margin: 0;
-    animation: fadeIn 1.5s ease-in;
 }
 
 @keyframes fadeIn {
@@ -49,7 +57,7 @@ h1 {
     margin: auto;
 }
 
-/* Container styles for login, registration, and tiles */
+/* Container styles */
 .container {
     background-color: white;
     border-radius: 15px;
@@ -71,7 +79,7 @@ h2 {
     color: #140850;
 }
 
-/* Label and form input styles */
+/* Form styles */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -86,7 +94,12 @@ label {
     margin-bottom: 5px;
 }
 
-input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"] {
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -146,19 +159,6 @@ footer {
     font-size: 14px;
 }
 
-/* Responsiveness for small screens */
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-        margin: 10px 0;
-    }
-}
-
-/* Hidden class to hide elements */
-.hidden {
-    display: none;
-}
-
 /* Success message styles */
 #success-message {
     text-align: center;
@@ -208,4 +208,22 @@ footer {
     to {
         stroke-dashoffset: 0;
     }
+}
+
+/* Hidden class */
+.hidden {
+    display: none;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin: 10px 0;
+    }
+}
+
+/* Hide extra Markbank text */
+h1 {
+    display: none;
 }

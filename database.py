@@ -1,5 +1,6 @@
 import uuid
 import smtplib
+from app.config import Config
 from email.mime.text import MIMEText
 from app.db_utils import get_db
 import psycopg2
@@ -50,13 +51,13 @@ class Database:
     def send_email_with_user_id(self, email, user_id_uuid):
         """Send an email with the user_id_uuid to the user."""
         try:
-            # Email configuration
-            sender_email = os.getenv('APP_SENDER')
-            sender_password = os.getenv('APP_PASSWORD')
+            # Pobranie konfiguracji z klasy Config
+            sender_email = Config.APP['sender']
+            sender_password = Config.APP['password']
             smtp_server = "smtp.gmail.com"
             smtp_port = 587
 
-
+            # Tworzenie treści e-maila
             subject = "Welcome to Markbank - Your User ID"
             body = f"Hello,\n\nThank you for registering at Markbank. Your unique User ID is: {user_id_uuid}\n\nPlease keep it safe."
             msg = MIMEText(body)
@@ -64,7 +65,7 @@ class Database:
             msg['From'] = sender_email
             msg['To'] = email
 
-            # Send the email
+            # Wysyłanie e-maila
             with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls()
                 server.login(sender_email, sender_password)
@@ -192,27 +193,47 @@ class Database:
         cursor.close()
         return [{"type": t[0], "amount": t[1], "date": t[2]} for t in transactions]
 
-    def update_user_details(self, user_id_uuid, email, phone_number):
+    def update_user_details(self, user_id_uuid, email=None, phone_number=None):
         """Updates the user's email and phone number."""
         cursor = get_db().cursor()
-        cursor.execute(
-            'UPDATE users SET email = %s, phone_number = %s WHERE user_id_uuid = %s',
-            (email, phone_number, user_id_uuid)
-        )
+
+        # Construct the query dynamically based on which fields are provided
+        if email and phone_number:
+            cursor.execute(
+                'UPDATE users SET email = %s, phone_number = %s WHERE user_id_uuid = %s',
+                (email, phone_number, user_id_uuid)
+            )
+        elif email:
+            cursor.execute(
+                'UPDATE users SET email = %s WHERE user_id_uuid = %s',
+                (email, user_id_uuid)
+            )
+        elif phone_number:
+            cursor.execute(
+                'UPDATE users SET phone_number = %s WHERE user_id_uuid = %s',
+                (phone_number, user_id_uuid)
+            )
+
         get_db().commit()
         cursor.close()
         return {"message": "Personal details updated"}
 
-    def update_password(self, account_id, new_password):
-        """Updates the user's account password."""
-        cursor = get_db().cursor()
-        cursor.execute(
-            'UPDATE accounts SET password = %s WHERE account_id = %s',
-            (new_password, account_id)
-        )
-        get_db().commit()
-        cursor.close()
-        return {"message": "Password updated successfully"}
+    def update_password(self, user_id_uuid, new_password):
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute(
+                'UPDATE accounts SET password = %s WHERE user_id_uuid = %s',
+                (new_password, user_id_uuid)
+            )
+            db.commit()
+            cursor.close()
+            logging.info("Password updated successfully for user_id_uuid: %s", user_id_uuid)
+            return {"message": "Password updated successfully"}
+        except Exception as e:
+            db.rollback()
+            logging.error("Failed to update password for user_id_uuid %s: %s", user_id_uuid, e)
+            return {"error": f"An error occurred: {str(e)}"}
 
     def getCurrentPassword(self, user_id_uuid):
         """Fetches the current password for the user."""
