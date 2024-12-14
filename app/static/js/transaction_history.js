@@ -1,9 +1,12 @@
 async function fetchTransactionHistory() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
+    const transactionList = document.getElementById('transaction_history');
+
     if (!userId) {
-        document.getElementById('transaction_history').innerHTML = "<li>Error: No user ID provided</li>";
+        transactionList.innerHTML = "<li>Error: No user ID provided</li>";
         return;
     }
+
     try {
         const response = await fetch(`/transactions/${userId}`);
         if (!response.ok) {
@@ -11,8 +14,7 @@ async function fetchTransactionHistory() {
         }
 
         const transactions = await response.json();
-        const transactionList = document.getElementById('transaction_history');
-        transactionList.innerHTML = "";  // Wyczyść poprzednie wpisy
+        transactionList.innerHTML = "";
 
         if (transactions.length > 0) {
             transactions.forEach(transaction => {
@@ -24,9 +26,9 @@ async function fetchTransactionHistory() {
             transactionList.innerHTML = "<li>No transactions found.</li>";
         }
     } catch (error) {
-        document.getElementById('transaction_history').innerHTML = `<li>Error: ${error.message}</li>`;
+        transactionList.innerHTML = `<li>Error: ${error.message}</li>`;
     }
 }
 
-// Automatyczne załadowanie historii transakcji po otwarciu strony
+
 window.onload = fetchTransactionHistory;
