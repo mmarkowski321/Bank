@@ -9,15 +9,15 @@ class Account:
         if amount > 0:
             self.balance += amount
             return {"message": f"Wpłacono {amount}. Nowe saldo: {self.balance}"}
-        return {"error": "Kwota musi być większa od zera."}
+        raise ValueError("Kwota musi być większa od zera.")
 
     def withdraw(self, amount):
         if amount > 0:
             if self.balance >= amount:
                 self.balance -= amount
                 return {"message": f"Wypłacono {amount}. Nowe saldo: {self.balance}"}
-            return {"error": "Niewystarczające środki na koncie."}
-        return {"error": "Kwota musi być większa od zera."}
+            raise ValueError("Niewystarczające środki na koncie.")
+        raise ValueError("Kwota musi być większa od zera.")
 
     def get_balance(self):
         return {"user_id": self.user_id, "balance": self.balance}
