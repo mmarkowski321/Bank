@@ -13,3 +13,4 @@ initialize_routes(app)
 @app.teardown_appcontext
 def close_connection(exception):
     close_db()
+

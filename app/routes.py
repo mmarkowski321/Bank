@@ -12,7 +12,9 @@ def initialize_routes(app):
     def dashboard():
         user_id = request.args.get('user_id')
         if not user_id:
+            logging.debug("No user_id provided, redirecting to index")
             return redirect(url_for('index'))
+        logging.debug(f"Rendering dashboard for user_id: {user_id}")
         return render_template('dashboard.html', user_id=user_id)
 
     @app.route('/register', methods=['GET', 'POST'])
@@ -21,7 +23,7 @@ def initialize_routes(app):
             return render_template('register.html')
         elif request.method == 'POST':
             data = request.get_json()
-            logging.debug("Received data for registration: %s", data)  # Logowanie danych
+            logging.debug("Received data for registration: %s", data)
 
             user_data = {
                 'first_name': data.get('first_name'),
@@ -45,7 +47,7 @@ def initialize_routes(app):
     @app.route('/login', methods=['POST'])
     def login():
         data = request.get_json()
-        logging.debug("Received login data: %s", data)  # Log incoming data for debugging
+        logging.debug("Received login data: %s", data)
 
         user_id = data.get('user_id')
         password = data.get('password')
@@ -101,8 +103,8 @@ def initialize_routes(app):
     def transaction_history(user_id):
         transactions = db.get_transaction_history(user_id)
         if transactions:
-            return jsonify(transactions), 200
-        return jsonify({"error": "No transactions found"}), 404
+            return render_template('transaction_history.html', transactions=transactions)
+        return render_template('transaction_history.html', transactions=[])
 
     @app.route('/update_user_details', methods=['POST'])
     def update_user_details():
@@ -115,11 +117,9 @@ def initialize_routes(app):
             if not user_id:
                 return jsonify({"error": "User ID is required"}), 400
 
-            # Check if at least one of the fields is provided
             if not email and not phone_number:
                 return jsonify({"error": "Please provide an email or phone number to update"}), 400
 
-            # Update the database with the provided fields
             result = db.update_user_details(user_id, email, phone_number)
             return jsonify(result), 200
         except Exception as e:
@@ -140,16 +140,13 @@ def initialize_routes(app):
             if not user_id or not current_password or not new_password:
                 return jsonify({"error": "Missing required fields"}), 400
 
-            # Retrieve the current password from the database
             stored_password = db.getCurrentPassword(user_id)
             if not stored_password:
                 return jsonify({"error": "User not found"}), 404
 
-            # Check if the current password matches
             if current_password != stored_password:
                 return jsonify({"error": "Current password is incorrect"}), 401
 
-            # Update the password in the database
             result = db.update_password(user_id, new_password)
             return jsonify(result), 200
         except Exception as e:
@@ -175,3 +172,11 @@ def initialize_routes(app):
             return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
+    @app.route('/transaction_history.html')
+    def transaction_history_redirect():
+        user_id = request.args.get('user_id')
+        if not user_id:
+            logging.debug("No user_id provided, redirecting to dashboard")
+            return redirect(url_for('dashboard'))
+        logging.debug(f"Redirecting to transaction history for user_id: {user_id}")
+        return redirect(url_for('transaction_history', user_id=user_id))

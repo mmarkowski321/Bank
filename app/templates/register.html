@@ -9,9 +9,7 @@
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </head>
 <body>
-    <div id="title">
-        <h1>Markbank Registration</h1>
-    </div>
+    {% include 'header.html' %}
     <div id="main">
         <div class="container" id="register">
             <h2>Create an Account</h2>
@@ -39,7 +37,10 @@
                 <div class="form-group">
     <label for="phone">Phone Number</label>
     <div style="display: flex;">
-        <select id="country_code" required title="Select your country code"></select>
+        <select id="country_code" required title="Select your country code">
+    <option value="" disabled selected>Select your country code</option>
+</select>
+
         <input id="phone" type="tel" required title="Enter your phone number without the country code." style="flex: 1;">
     </div>
 </div>
@@ -87,7 +88,6 @@
             </form>
         </div>
 
-        <!-- Success Message -->
         <div id="success-message" class="hidden">
             <div class="checkmark-wrapper">
                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">

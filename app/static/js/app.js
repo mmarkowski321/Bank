@@ -1,6 +1,5 @@
-// Funkcja logowania
 async function login(event) {
-    event.preventDefault(); // Prevents the default form submission
+    event.preventDefault();
 
     const userId = document.getElementById('user_id').value;
     const password = document.getElementById('password').value; // Corrected reference
@@ -28,14 +27,11 @@ async function login(event) {
 }
 
 
-// Funkcja przekierowania do strony rejestracji
+
 function displayRegistration() {
     window.location.href = '/register';
 }
 
-// Funkcja rejestracji
-// Function to handle user registration
-// Function to handle user registration
 async function register(event) {
     event.preventDefault();
 
@@ -51,14 +47,13 @@ async function register(event) {
         // Get the selected country code and phone number
         const countryCode = document.getElementById('country_code').value;
         const phone = document.getElementById('phone').value;
-        const fullPhoneNumber = `${countryCode}${phone}`; // Combine country code and phone number
+        const fullPhoneNumber = `${countryCode}${phone}`;
 
         const password = document.getElementById('password').value;
         const pin = document.getElementById('pin').value;
         const accountType = document.querySelector('input[name="account_type"]:checked').value;
 
         try {
-            // Send registration data to the server
             const response = await fetch('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -68,7 +63,7 @@ async function register(event) {
                     last_name: lastName,
                     date_of_birth: dateOfBirth,
                     email: email,
-                    phone: fullPhoneNumber, // Use the combined full phone number
+                    phone: fullPhoneNumber,
                     password: password,
                     pin: pin,
                     account_type: accountType
@@ -78,7 +73,6 @@ async function register(event) {
             const result = await response.json();
 
             if (response.ok) {
-                // Hide the form and show the success message
                 document.getElementById('register').classList.add('hidden');
                 document.getElementById('success-message').classList.remove('hidden');
             } else {
@@ -93,7 +87,7 @@ async function register(event) {
 }
 
 
-// Funkcja pobierania salda
+
 async function getBalance() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     const response = await fetch(`/balance/${userId}`);
@@ -101,7 +95,7 @@ async function getBalance() {
     document.getElementById('balance').innerText = result.balance ? `${result.balance} zł` : result.error;
 }
 
-// Funkcja wpłaty
+
 async function deposit() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     const amount = parseFloat(document.getElementById('deposit_amount').value);
@@ -117,7 +111,7 @@ async function deposit() {
     getBalance();
 }
 
-// Funkcja wypłaty
+
 async function withdraw() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     const amount = parseFloat(document.getElementById('withdraw_amount').value);
@@ -133,7 +127,6 @@ async function withdraw() {
     getBalance();
 }
 
-// Funkcja przelewu
 async function transfer() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     const userIdTo = document.getElementById('transfer_to_user_id').value;
@@ -150,24 +143,24 @@ async function transfer() {
     getBalance();
 }
 
-// Funkcja wylogowania
 function logout() {
     window.location.href = '/';
 }
 function goToTransactionHistory() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     if (userId) {
-        window.location.href = `/transaction_history?user_id=${userId}`;
+        window.location.href = `/transactions/${userId}`;
     } else {
         alert("User ID not found");
     }
 }
+
 function profileSettings() {
     const userId = new URLSearchParams(window.location.search).get('user_id');
     if (userId) {
         window.location.href = `/profile.html?user_id=${userId}`;
     } else {
-        alert("User ID not found. Please log in again.");
+        alert("User ID not found");
     }
 }
 async function changePassword(event) {
@@ -230,12 +223,10 @@ async function updateData(event) {
     const newPhone = document.getElementById('new_phone').value;
     const userId = new URLSearchParams(window.location.search).get('user_id');
 
-    // Prepare the data object with only filled-out fields
     let dataToUpdate = { user_id: userId };
     if (newEmail) dataToUpdate.email = newEmail;
     if (newPhone) dataToUpdate.phone = newPhone;
 
-    // Check if at least one field is filled out
     if (!newEmail && !newPhone) {
         alert("Please fill out at least one field to update.");
         return;
@@ -272,7 +263,6 @@ function validatePinLength(input) {
         input.value = input.value.slice(0, 4); // Limit to 4 characters
     }
 }
-// Function to populate country codes
 function populateCountryCodes() {
     const countryCodes = [
         { name: "United States", code: "+1" },
@@ -292,7 +282,6 @@ function populateCountryCodes() {
         { name: "Mexico", code: "+52" },
         { name: "Netherlands", code: "+31" },
         { name: "Poland", code: "+48" },
-        // Add more country codes as needed
     ];
 
     const select = document.getElementById('country_code');
@@ -304,7 +293,38 @@ function populateCountryCodes() {
     });
 }
 
-// Call the populateCountryCodes function on window load
-window.onload = function() {
-    populateCountryCodes();
-};
+document.addEventListener("DOMContentLoaded", populateCountryCodes);
+
+async function fetchTransactionHistory() {
+    const userId = new URLSearchParams(window.location.search).get('user_id');
+    const transactionList = document.getElementById('transaction_history');
+
+    if (!userId) {
+        transactionList.innerHTML = "<li>Error: No user ID provided</li>";
+        return;
+    }
+
+    try {
+        const response = await fetch(`/transactions/${userId}`);
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const transactions = await response.json();
+        transactionList.innerHTML = "";
+
+        if (transactions.length > 0) {
+            transactions.forEach(transaction => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Type: ${transaction.type}, Amount: ${transaction.amount} zł, Date: ${transaction.date}`;
+                transactionList.appendChild(listItem);
+            });
+        } else {
+            transactionList.innerHTML = "<li>No transactions found.</li>";
+        }
+    } catch (error) {
+        transactionList.innerHTML = `<li>Error: ${error.message}</li>`;
+    }
+}
+
+window.onload = fetchTransactionHistory;

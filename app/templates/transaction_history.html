@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction History - Markbank</title>
+    <title>Transaction History</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="{{ url_for('static', filename='js/transaction_history.js') }}" defer></script>
 </head>
 <body>
-    <div id="title">
-        <h1>Transaction History</h1>
-    </div>
-
+    {% include 'header.html' %}
     <div id="main">
-        <div class="container">
+        <div class="title-card">
             <h2>Your Transactions</h2>
-            <ul id="transaction_history">
-                <li>Loading transaction history...</li>
-            </ul>
+        </div>
+        <div class="transaction-container">
+            {% for transaction in transactions %}
+            <div class="transaction-card">
+                <p><strong>Type:</strong> {{ transaction.type }}</p>
+                <p><strong>Amount:</strong> {{ transaction.amount }} zł</p>
+                <p><strong>Date:</strong> {{ transaction.date }}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
-
-    <footer>
-        <p>This application is for educational purposes only. It does not handle real financial transactions.</p>
-    </footer>
 </body>
 </html>
