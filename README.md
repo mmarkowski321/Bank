@@ -8,6 +8,18 @@ This project is an online banking application that allows users to perform basic
 
 You can access and test the application here: [Online Banking Application](https://app.markbank-privateproject.com/)
 
+### How to Use
+1. **Register**: Create a new account by providing your personal details.
+2. **Check Your Email**: After registration, check your email for your unique **User ID**.
+3. **Log In**:
+   - Enter the **User ID** you received in your email.
+   - Provide the password you set during registration.
+4. **Explore Features**:
+   - View account balance.
+   - Deposit or withdraw funds.
+   - Make transfers to other accounts.
+   - Change your password or update your personal information.
+
 ## Features
 
 - **User Registration**: Users can register by providing personal information. Each user receives a unique identifier sent directly to their email.
@@ -18,6 +30,15 @@ You can access and test the application here: [Online Banking Application](https
   - Making online transfers to other registered users.
 - **Transaction History**: Every transaction is recorded and displayed in the user's history.
 - **Error Handling**: The application provides appropriate feedback in case of invalid data or operations.
+
+## In Progress: Upcoming Features
+
+The application is actively being developed, and the following features are in progress:
+- **Multi-currency Accounts**: Users will be able to hold balances in multiple currencies within the same account.
+- **Currency Exchange**: The application will enable users to exchange their current balance into other currencies at real-time exchange rates.
+- **Loan Services**: Users will be able to apply for loans directly from the application, with tailored repayment options and interest rates.
+
+Stay tuned for updates!
 
 ## Cloud Infrastructure
 
