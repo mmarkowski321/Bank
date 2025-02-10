@@ -1,4 +1,5 @@
-![Bank Application](https://github.com/user-attachments/assets/48ee995e-cbfa-42f6-8238-7cd122a9c3ec)
+
+![Zrzut ekranu 2025-02-10 021508](https://github.com/user-attachments/assets/e75c5410-10ff-4558-8e5a-d51470fa618f)
 
 # Online Banking Application
 
