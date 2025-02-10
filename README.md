@@ -1,7 +1,6 @@
-![image](https://github.com/user-attachments/assets/48ee995e-cbfa-42f6-8238-7cd122a9c3ec)
+![Bank Application](https://github.com/user-attachments/assets/48ee995e-cbfa-42f6-8238-7cd122a9c3ec)
 
-
-### Online Banking Application
+# Online Banking Application
 
 This project is an online banking application that allows users to perform basic banking operations. Users can register, log in, and manage their accounts conveniently and securely.
 
@@ -19,6 +18,16 @@ You can access and test the application here: [Online Banking Application](https
   - Making online transfers to other registered users.
 - **Transaction History**: Every transaction is recorded and displayed in the user's history.
 - **Error Handling**: The application provides appropriate feedback in case of invalid data or operations.
+
+## Cloud Infrastructure
+
+This application is hosted on **AWS Cloud** and utilizes the following services:
+- **EC2**: Virtual machine hosting the application with Docker and Nginx for serving content.
+- **RDS**: Managed PostgreSQL database for secure and scalable data storage.
+- **Route 53**: DNS management and domain routing.
+- **VPC**: Isolated network for secure communication between application components.
+- **Nginx**: Reverse proxy for handling HTTP/HTTPS traffic and load balancing.
+- **SSL Certificate**: The application is secured with an SSL certificate to ensure encrypted communication.
 
 ## Technologies and Libraries
 
